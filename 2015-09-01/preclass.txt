@@ -11,13 +11,16 @@ with questions for class!
     you computed this, and give URLs for where you got the parameters
     in your calculation.  (We will return to this question again after
     we cover some computer architecture.)
-    
-2.  What is the approximate theoretical peak flop rate for your own machine?
 
+        http://www.intel.com/content/www/us/en/processors/xeon/xeon-phi-detail.html
+        about 1.2 T FLOP each for Xeon Phi Accelerator boards.
+        No idea.
+2.  What is the approximate theoretical peak flop rate for your own machine?
+        Hmm.
 3.  Suppose there are t tasks that can be executed in a pipeline
     with p stages.  What is the speedup over serial execution of the
     same tasks?
-
+        HMM.... No idea.
 4.  Consider the following list of tasks (assume they can't be pipelined):
 
       compile GCC (1 hr)
@@ -30,6 +33,7 @@ with questions for class!
     What is the minimum serial time between starting to compile and having
     a compiled application?  What is the minimum parallel time given
     an arbitrary number of processors?
+        Ehh....
 
 5.  Clone the membench repository from GitHub:
 
