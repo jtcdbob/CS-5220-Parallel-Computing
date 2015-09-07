@@ -21,3 +21,13 @@ Consider the following questions:
 2. What about a simple model to predict time for one person to count?
 3. How big should the class be before the parallel method takes less time?
 
+I. A simple model for the parallized counting will consist of
+        a. Overhead time for counting, which includes starting time t_a_1, instructor gathering counts time t_a_2, instructor doing arithmetic time t_a_3.
+        b. Students doing time each row t_b
+   The total time will be 
+                T = t_a_1 + (t_b + t_a_2) + t_a_3
+II. The time for one student to count is approximately time to count each row times number of rows:
+                T = (time per row) * (# of rows)
+III. It is more efficient to use the parallel method when the total time in I is more than the total time in II. For a rough estimate, we assume the number of people in each row is the same, the rows needed is approximately
+        (# of rows needed) = (t_a_1 + t_a_2 + t_a_3)/(time per row) + 1
+  The number of people can be then calculated.

@@ -1,3 +1,8 @@
+******************
+I had no idea those notes were for grading so I simply sketched some quick answers for my own reference when I was first reading through them.
+******************
+
+
 ## Reading questions
 
 The first two questions are questions from last time, but worth
@@ -15,12 +20,40 @@ with questions for class!
         http://www.intel.com/content/www/us/en/processors/xeon/xeon-phi-detail.html
         about 1.2 T FLOP each for Xeon Phi Accelerator boards.
         No idea.
+    **************************
+A:  From what I found online:
+    http://ark.intel.com/products/71992/Intel-Xeon-Phi-Coprocessor-5110P-8GB-1_053-GHz-60-core
+    http://stackoverflow.com/questions/15655835/flops-per-cycle-for-sandy-bridge-and-haswell-sse2-avx-avx2
+    http://scicomp.stackexchange.com/questions/11306/how-to-determine-the-amount-of-flops-my-computer-is-capable-of
+    The Intel Xeon Phi 5110P has base frequency of 1.053 GHz and it does 16 flops per cycle. So the theoretical peak flop rate is
+        1.053 GHz * 16 Flops/cycle * 60 cores * 8 nodes = 8.09 Tflops/s
+
 2.  What is the approximate theoretical peak flop rate for your own machine?
         Hmm.
+    *******************
+A:  My machine has Intel Core i5-4258U Processor with specs that can be found in
+   http://ark.intel.com/products/75990/Intel-Core-i5-4258U-Processor-3M-Cache-up-to-2_90-GHz
+   It has peak frequency of 2.9 GHz and 2 cores. Since it's a Haswell, according to one of the links in question 4, it can do 16 flops/cycle. The peak flop rate is
+        2.9 GHz * 16 flops/cycle * 2 cores = 92.8 Gflops/s
+
 3.  Suppose there are t tasks that can be executed in a pipeline
     with p stages.  What is the speedup over serial execution of the
     same tasks?
         HMM.... No idea.
+    *******************
+A:  The time needed for serial execution is
+        T_s = t*p
+    The time needed for pipelining is
+        T_p = t + p - 1
+    Because it takes t-1 time units to start the last task and another p time to finish the last one
+        &&&&&
+         &&&&&
+          &&&&&
+           &&&&&
+        ^^^         -> t-1
+           ^^^^^    -> p
+    Therefore the overall speedup is
+        T_s - T_p = t*p - t - p + 1
 4.  Consider the following list of tasks (assume they can't be pipelined):
 
       compile GCC (1 hr)
@@ -34,7 +67,13 @@ with questions for class!
     a compiled application?  What is the minimum parallel time given
     an arbitrary number of processors?
         Ehh....
-
+    **********************
+A:  The task can be divided and parallelized as
+        GCC ---> OpenMPI            ------> Application
+          |---->  BLAS   ----> LAPACK -|
+    Given the time to execute each subtask, the most time consuming line is
+        GCC -> OpenBLAS -> LAPACK -> Application
+    The total time is 2.25 hr.
 5.  Clone the membench repository from GitHub:
 
        git clone git@github.com:cornell-cs5220-f15/membench.git
