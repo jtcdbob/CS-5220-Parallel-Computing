@@ -21,24 +21,35 @@ something into an already-full cache.
 1. Suppose 16N is significantly larger than the size of our L3 cache. What is
 the memory-based AI of this code? (Hint: What is the memory-based AI of just the
 innermost loop?)
-
-
+A: Because 16N is significantly larger than the L3 cache, the machine cannot fit one complete column/row in the cache. Therefore, it has to perform the computation entry-wise and adds to C[i,j] each time. 
+        AI = (N^3+N^3) flops/ (2*8)*(N^2*N^2+N^2+N^2) bytes ~= 1/(8N) flops/bytes 
+****************
+   If the write to the cache and write back from the cache is not considered, the AI should double the above value.
+   ####
+   intensity 1 (flops/double)
 2. Now suppose that the cache is substantially larger than 16N, but
 substantially smaller than 8N^2. What is the AI now?
-
-
+A: In this case, it is possible to fit one column/row into the cache but not the entire matrix. Therefore, it does computation for one column/row and then adds up to be stored in C[i,j].
+        AI = (N^3 + N^3) flops/ (2*8)*(N*N^2+N^2+N^2) bytes = 1/8 flops/bytes 
+   ####
+   intensity 2 (flops/double)
 3. Now suppose the cache is large enough to hold all of A, B, and C. What is the
 AI now? (Hint: Writing to a byte of memory not already in the cache incurs two
 memory transfers: one to move the data to the cache for writing, and one to move
 the written data back to main memory.)
-
-
+A: Now that the cache is large enough to hold everything, the machine only needs to load everything once. The AI is
+        AI = (N^3 + N^3) flops/ (2*8)*(N^2+N^2+N^2) bytes = N/24 flops/bytes
+   ####
+   intensity N (flops/double) [The cost to read/write to C(i,j) is ignored]
 4. Cache overflowing. On my CPU (Intel i7-4700 HQ), L1, L2, and L3 caches are 32
 KB, 256 KB, and 6 MB respectively. What is the largest problem size N that will
 fit in each cache? What is the arithmetic intensity associated with each problem
 size?
-
-
+? The largest problem size that will fit? If the problem is analyzed entry-wise, don't all problems fit? Memory shouldn't limit the problem if we don't use any. What am I missing here?
+   ####
+   version 1: divide everything by 3 and allocate those to ABC.
+   version 2: divide everything by 2 and allocate those to AB without consideration to C.
+   version 3: just keep and reuse B.
 5. My CPU has 4 cores, each of which can do 8 fused multiply-adds per cycle, has
 a clock rate of 2.4 GHz, and a memory bandwidth of 25.6 GB/s. At what arithmetic
 intensity does my machine become CPU-bound?
