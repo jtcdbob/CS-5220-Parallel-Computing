@@ -1,0 +1,21 @@
+1. Look up the specs for the totient nodes. Having read the Roofline paper,
+   draw a roofline diagram for one totient node (assuming only the
+   host cores are used, for the moment).  How do things change with
+   the addition of the two Phi boards?
+A: With the addition of the two Phi boards, the ridge point will move to the right because now there is more computational power with the same amount of bandwidth.
+2. What is the difference between two cores and one core with
+   hyperthreading?
+A: Two cores has two physical computational unit whereas the hyperthreading takes advantage of independent pipelines and increases the amount of parallelelization on the same processor.
+3. Do a Google search to find a picture of how memories are arranged
+   on the Phi architecture.  Describe the setup briefly in your own
+   words.  Is the memory access uniform or non-uniform?
+A: Each coprocessor core has its own L2 cache and they are connected via an interprocessor network (IPN) ring. The IPN ring also connects those cores to GDDR5 memory controllers. The memory access is non-uniform.
+   [http://www.intel.com/content/dam/www/public/us/en/documents/datasheets/xeon-phi-coprocessor-datasheet.pdf -- figure 2.4]
+4. Consider the parallel dot product implementations suggested in the
+   slides.  As a function of the number of processors, the size of the
+   vectors, and typical time to send a message, can you predict the
+   speedup associated with parallelizing a dot product computation?
+   [Note that dot products have low arithmetic intensity -- the
+    roofline model may be useful for reasoning about the peak
+    performance for computing pieces of the dot product]
+A: When the vector size n is divided by the number of cores p, we get the ratio n/p. If this ratio is big, we hit the computational ceiling, so the peak performance is limited by the computational power. A parallelization in this case will reduce the parallelizable parts of the computation to 1/p of its serial time. On the other hand, if the ratio n/p is not big, the speed is limited by the typical time to send the message, so the speedup will not be as ideal as the previous case. The speed won't be p times the serial case but only a fraction of it depending on the ratio and memory traffic.
