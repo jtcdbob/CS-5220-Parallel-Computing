@@ -3,7 +3,7 @@
 
 #include "crc32.h"
 #include "life_common.h"
-
+#include <time.h>
 
 /**
  * Print a text representation of the current state of the board
@@ -118,6 +118,9 @@ int main(int argc, char** argv)
 {
     problem_t problem;
     read_options(argc, argv, &problem);
+
+    clock_t start = clock(), diff; //Clocking
+
     if (problem.verbose) {
         for (int i = 0; i < problem.g; ++i) {
             printf("\nGeneration %d\n", i);
@@ -126,6 +129,11 @@ int main(int argc, char** argv)
         }
     } else
         advance_board(&problem, problem.g);
+
+    diff = clock() - start; //get the time and print the result
+    int msec = diff*1000/CLOCKS_PER_SEC;
+    printf("Time taken %d seconds %d milliseconds", msec/1000, msec%1000);
+
     printf("Final checksum: %08X\n", board_checksum(&problem));
     destroy_board(&problem);
     return 0;

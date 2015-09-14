@@ -5,14 +5,27 @@ the glider pattern for a few generations.
 
 0.  How much time did you spend on this pre-class exercise, and when?
 
+A:  Start at 1:46PM Monday, end at 3:08 Monday. Approximately 82 mins.
+
 1.  What are one or two points that you found least clear in the
     9/15 slide decks (including the narration)?
 
+A:  The concept of load balancing is not very clear.
+    The explanation of an implementation for high-performance game of life is not clear. 
+        What does it mean to assume a matrix version. 
+        How does one use a fast vectorized kernal to update small blocks. 
+        How is the generation skipping pattern for coarse blocking determined. 
+        Does dynamic scheduling mean an event-driven update?
+    There is a lot of information in particle systems slide. Many terms are briefly mentioned and not discussed.
 2.  In the basic implementation provided, what size board for the Game
     of Life would fit in L3 cache for one of the totient nodes?  Add a
     timer to the code and run on the totient node.  How many cells per
     second can we update for a board that fits in L3 cache?  For a
     board that does not fit?
+
+A: According to online documentation, the L3 cache size is 15MB for one of the totient nodes. In this basic implementation,we keep two boards with each cell represented by a 8-bit chars. So the size that will fit in L3 cache should be
+        N = sqrt(15MB/(2*8bits))= 2700
+    So a board of size no more than 2700 should be able to fit in the L3 cache.
 
 3.  Assuming that we want to advance time by several generations,
     suggest a blocking strategy that would improve the operational
@@ -21,11 +34,15 @@ the glider pattern for a few generations.
     want to try your hand at implementing your strategy (though you
     need not spend too much time on it).
 
+A:  Divide the board into N*N sub-blocks and check if there are cells in each sub-block. If there is none, we only check the sides of those sub-blocks to see if there is possible generation of cells to those blocks.
+
 4.  Comment on what would be required to parallelize this code
     according to the domain decomposition strategy outlined in the
     slides.  Do you think you would see good speedups on one of
     the totient nodes?  Why or why not?
 
+A:  To parallelize the domain decomposition strategy, we must ensure that the communication between each processor can be done efficiently, so that we can get a good speedup.
+    It depends, but most likely no. Because in order for this strategy to work, each processor has to finish individual computation before communicating to others. Because the cells are not always uniformly distributed, the time it takes for certain regions may be significantly longer than the rest therefore becoming the bottleneck of the entire computation.
 5.  Suppose we want to compute long-range interactions between two
     sets of particles in parallel using the obvious n^2 algorithm in a
     shared-memory setting.  A naive implementation might look like
@@ -49,3 +66,5 @@ the glider pattern for a few generations.
     Based on what you know about memories and parallel architecture,
     do you see any features of this approach that are likely to lead
     to poor performance?
+
+A:  First of all, the computation is not done simultaneously (from the view of particles). Consider the two particles p1 and p5. In the first loop, p1 interacts with all n particles and get updated to its new position. Then the program keeps looping until it reaches p5 and then let p5 interact with p1. Because p1 is already updated to its new position, p5 is essentially interacting with p1 at its new position. This feature is certainly not intended in the code.
