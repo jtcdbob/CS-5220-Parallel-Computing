@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef WITH_TIMING
+#include <omp.h>
+#endif
+
 #include "crc32.h"
 #include "life_common.h"
 #include <time.h>
@@ -127,13 +131,25 @@ int main(int argc, char** argv)
             print_board(&problem);
             advance_board(&problem, 1);
         }
-    } else
+    } else {
+#ifdef WITH_TIMING
+        double t0 = omp_get_wtime();
         advance_board(&problem, problem.g);
+        double t1 = omp_get_wtime();
+        printf("Cells / sec: %e\n",
+               problem.g * problem.nboard * problem.nboard / (t1-t0));
+#else
+        advance_board(&problem, problem.g);
+<<<<<<< HEAD
 
     diff = clock() - start; //get the time and print the result
     int msec = diff*1000/CLOCKS_PER_SEC;
     printf("Time taken %d seconds %d milliseconds", msec/1000, msec%1000);
 
+=======
+#endif
+    }
+>>>>>>> upstream/master
     printf("Final checksum: %08X\n", board_checksum(&problem));
     destroy_board(&problem);
     return 0;
