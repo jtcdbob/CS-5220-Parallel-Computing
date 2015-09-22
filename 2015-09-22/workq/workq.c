@@ -43,7 +43,7 @@ void lprintf(const char* format, ...)
 
 /************************* Work queue ******************************/
 
-/* 
+/*
  * Each task consists of a pointer to user-managed data and a next
  * task.  If this was a C++ program, I would use a template here to
  * allow different data types.
@@ -58,7 +58,7 @@ typedef struct task_t {
  * The work queue consists not only of the head of a linked lisk of tasks,
  * but also a lock and condition variable for synchronizing the interaction
  * of producers (who put items on the queue) and consumers (who pull items).
- * 
+ *
  * For the moment, we assume that there is some logic in place to decide
  * when no more work will be produced, and that some entity can run this
  * logic and set the "done" flag.  In very dynamic situations, deciding
@@ -150,10 +150,18 @@ void workq_wait(workq_t* workq)
  */
 void workq_put(workq_t* workq, void* data)
 {
+    // Lock the work queue while adding the task
+    workq_lock(workq);
+
     task_t* task = (task_t*) malloc(sizeof(task_t));
     task->data = data;
     task->next = workq->tasks;
     workq->tasks = task;
+
+    // Signal that there is task available
+    workq_signal(workq);
+    // Unlock the work queue after adding the task
+    workq_unlock(workq);
 }
 
 
@@ -165,12 +173,17 @@ void workq_put(workq_t* workq, void* data)
 void* workq_get(workq_t* workq)
 {
     void* result = NULL;
+
+    // Lock the work queue first
+    workq_lock(workq);
+    // Check if the work is done and continue
     if (workq->tasks) {
         task_t* task = workq->tasks;
         result = task->data;
         workq->tasks = task->next;
         free(task);
     }
+    workq_unlock(workq);
     return result;
 }
 
@@ -183,6 +196,7 @@ void* workq_get(workq_t* workq)
  */
 void workq_finish(workq_t* workq)
 {
+    workq_wait(workq);
     workq->done = 1;
 }
 
@@ -250,7 +264,7 @@ int main(int argc, char** argv)
     /* Initialize I/O mutex and work queue */
     pthread_mutex_init(&io_lock, NULL);
     workq_init(&workq);
-    
+
     /* Launch worker threads */
     for (i = 0; i < nworkers; ++i) {
         consumers[i].id = i;
@@ -258,16 +272,16 @@ int main(int argc, char** argv)
         pthread_create(&threads[i], NULL, consumer_main, &consumers[i]);
         lprintf("Create worker %d\n", i);
     }
-    
+
     /* Run producer */
     producer_main(&workq, 100);
-    
+
     /* Join on worker threads */
     for (i = 0; i < nworkers; ++i) {
         lprintf("Join worker %d\n", i);
         pthread_join(threads[i], NULL);
     }
-    
+
     /* Free I/O mutex and work queue */
     workq_destroy(&workq);
     pthread_mutex_destroy(&io_lock);
