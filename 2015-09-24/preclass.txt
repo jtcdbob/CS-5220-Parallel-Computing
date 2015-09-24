@@ -3,6 +3,12 @@
 1.  What are one or two points that you found least clear in the
     9/24 slide decks (including the narration)?
 
+A:  What is relaxed consistency? Is it explained after it is introduced?
+    I don't quite get how critical section work and when do I need it. (Actually, it makes more sense after the example in the slide about parallel loops example.)
+    The instruction "reduction" sounds really nice, but is there any danger in using it?
+
+    [I was interrupted and ran out of when I began to watch the second slide. I got the gist of it but I'm not sure I understand the details of sequentially consistency very well]
+
 2.  The omp_mc.c file in the demo subdirectory runs a Monte Carlo
     simulation to estimate the expected value of a uniform random
     variable.  The "-p" option sets the number of processors used,
@@ -12,6 +18,8 @@
        terms of the number of trials (N), number of processors (p),
        time per trial (t_trial), and time to update the global
        counters in the critical section (t_update).
+
+A:  Isn't it the same question as last time?
 
     b) Run the code with a few different parameter values in order
        to estimate N, t_trial, and t_update for this code on
@@ -26,3 +34,5 @@
     performance and correctness) in OpenMP codes.  Go through the
     checklist in the paper for omp_mc.c.  What performance mistakes
     are there in the demonstration implementation?
+
+A:  

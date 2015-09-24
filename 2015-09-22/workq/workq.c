@@ -121,6 +121,8 @@ void workq_signal(workq_t* workq)
 {
     pthread_cond_signal(&(workq->cv));
 }
+// Whether to wake up one person waiting on the condition,
+// or everyone waiting on this condition.
 
 
 /*
@@ -131,6 +133,7 @@ void workq_broadcast(workq_t* workq)
 {
     pthread_cond_broadcast(&(workq->cv));
 }
+// Broadcast wakes up everyone waiting on this condition.
 
 
 /*
@@ -141,6 +144,8 @@ void workq_wait(workq_t* workq)
 {
     while (workq->tasks == NULL && workq->done == 0)
         pthread_cond_wait(&(workq->cv), &(workq->lock));
+        // The first variable is condition variable and the second is the lock
+        // that the thread should hold when it is computed.
 }
 
 
@@ -176,6 +181,10 @@ void* workq_get(workq_t* workq)
 
     // Lock the work queue first
     workq_lock(workq);
+
+    // should wait before
+    workq_wait(workq);
+
     // Check if the work is done and continue
     if (workq->tasks) {
         task_t* task = workq->tasks;
@@ -183,6 +192,8 @@ void* workq_get(workq_t* workq)
         workq->tasks = task->next;
         free(task);
     }
+
+
     workq_unlock(workq);
     return result;
 }
@@ -196,6 +207,8 @@ void* workq_get(workq_t* workq)
  */
 void workq_finish(workq_t* workq)
 {
+    // workq_lock(workq);
+    // workq_broadcast(workq);
     workq_wait(workq);
     workq->done = 1;
 }
