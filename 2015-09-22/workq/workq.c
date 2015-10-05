@@ -163,8 +163,9 @@ void workq_put(workq_t* workq, void* data)
     task->next = workq->tasks;
     workq->tasks = task;
 
+    // lprintf("wtf?");
     // Signal that there is task available
-    workq_signal(workq);
+    workq_broadcast(workq);
     // Unlock the work queue after adding the task
     workq_unlock(workq);
 }
@@ -182,8 +183,11 @@ void* workq_get(workq_t* workq)
     // Lock the work queue first
     workq_lock(workq);
 
-    // should wait before
-    workq_wait(workq);
+    // // If there is no work to be done, just leave it.
+    // if (workq->done){
+    //   workq_unlock(workq);
+    //   return NULL;
+    // }
 
     // Check if the work is done and continue
     if (workq->tasks) {
@@ -193,7 +197,7 @@ void* workq_get(workq_t* workq)
         free(task);
     }
 
-
+    // Job is done, unlock the work queue.
     workq_unlock(workq);
     return result;
 }
@@ -207,10 +211,16 @@ void* workq_get(workq_t* workq)
  */
 void workq_finish(workq_t* workq)
 {
-    // workq_lock(workq);
-    // workq_broadcast(workq);
-    workq_wait(workq);
+    // Get the lock first
+    workq_lock(workq);
+
     workq->done = 1;
+
+    // Tell everyone
+    workq_broadcast(workq);
+    // Unlock
+    workq_unlock(workq);
+
 }
 
 
