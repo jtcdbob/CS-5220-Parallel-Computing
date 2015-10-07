@@ -1,7 +1,11 @@
 0.  How much time did you spend on this pre-class exercise, and when?
 
+A:  Wed 6:35PM - 7:27PM
+
 1.  What are one or two points that you found least clear in the
     10/08 slide decks (including the narration)?
+
+A:  Maybe more on the derivation for alpha-beta model will be nice.
 
 2.  Now that we are now basically a third of the way into the
     semester, and are (mostly) settled into the steady pace of things,
@@ -10,16 +14,28 @@
     particularly useful -- venting about the cluster, for example, is
     understandable but doesn't help me that much in adjusting!
 
+A:  I like the slides because I can review them whenever I want. The morning class is not so great, mostly because it is hard to stay awake. It will be really helpful if we can get some notes for the lecture discussion. Does not have to detailed, an outline for the topic will be helpful enough. Preclass questions are helping, but sometimes it takes a while to understand what needs to be done. More hints on the questions will be nice.
+    For the cluster, sometimes, people run their programs on the head node and that takes so much resources that I couldn't even do basic editing and qsub. Will it be possible to limit the running time on head node? I'm asking because I don't know what the answer will be.
+
 3.  The ring demo implements the protocol described in the particle
     systems slide deck from 9/15:
 
     http://cornell-cs5220-f15.github.io/slides/2015-09-15-particle.html#/11
 
     a) In your own words, describe what ring.c is doing.
-
+A:
+        1. Each processor has two particles.
+        2. The two particles first interact with each other and get saved to the pointer array result.
+        3. The two particles interact with all other particles in looping order:
+            a. The processor reads buffer from previous one and sends its current buffer to the next one. Close the loop using periodic boundary condition.
+            b. On each processor, the values in result pointer array interact with the buffer, which is the particle information from other processor.
+            c. Continue the loop until the particles on each processor finish interacting with all other particles.
+        4. Free the buffer and call MPI_Finalize().
     b) How might you modify the code to have the same computational
        pattern, but using non-blocking communication rather than
        MPI_Sendrecv?  Note that according to the MPI standard,
        one isn't supposed to read from a buffer that is being
        handled by a non-blocking send, so it is probably necessary
        to use three temporary buffers rather than the current two.
+A:  Instead of using MPI_Sendrecv, it might be possible to use MPI_Isend to send the message. We can set the condition to be whether the next processor finishes the interact(). Once the buffer is sent, the processor can signal the next processor to receive the buffer. The processor uses MPI_Irecv to receive message.
+    This way, the send and receive will not block each other, so the message flow will not be stuck if computation on one processor becomes the bottleneck.
